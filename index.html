@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>microCMS プレビュー</title>
+    
+    <!-- Tailwind CSS: スタイリング用 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- marked.js: MarkdownをHTMLに変換するライブラリ -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+    <!-- microCMS JavaScript SDK: microCMSからデータを取得するためのライブラリ -->
+    <script src="https://unpkg.com/microcms-js-sdk@latest/dist/umd/microcms-js-sdk.js"></script>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* 日本語フォントと基本的なスタイルを適用 */
+        body {
+            font-family: 'Noto+Sans+JP', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        /* Markdownから変換されたHTML要素のスタイル調整 */
+        .prose h1 { font-size: 2.25rem; font-weight: 700; border-bottom: 1px solid #e5e7eb; padding-bottom: 0.5rem; margin-bottom: 1.5rem; }
+        .prose h2 { font-size: 1.875rem; font-weight: 700; border-bottom: 1px solid #e5e7eb; padding-bottom: 0.5rem; margin-top: 2.5rem; margin-bottom: 1rem; }
+        .prose h3 { font-size: 1.5rem; font-weight: 700; margin-top: 2rem; margin-bottom: 1rem; }
+        .prose p { line-height: 1.8; margin-bottom: 1.25rem; }
+        .prose ul { list-style-type: disc; padding-left: 1.75rem; margin-bottom: 1.25rem; }
+        .prose li { margin-bottom: 0.5rem; }
+        .prose strong { font-weight: 700; }
+        .prose a { color: #2563eb; text-decoration: underline; }
+        .prose blockquote { border-left: 4px solid #d1d5db; padding-left: 1rem; color: #6b7280; margin-bottom: 1.25rem; }
+    </style>
+</head>
+<body class="bg-gray-100">
+
+    <main class="container mx-auto max-w-4xl px-4 py-8 sm:py-12">
+        <!-- 記事のタイトルと本文がここに表示されます -->
+        <article id="article-container" class="prose max-w-none bg-white p-6 sm:p-10 rounded-lg shadow-md">
+            <h1 id="article-title" class="text-gray-400">データを読み込み中...</h1>
+            <div id="article-body" class="text-gray-400">
+                <p>microCMSからプレビューデータを取得しています。しばらくお待ちください。</p>
+            </div>
+        </article>
+    </main>
+
+    <script>
+        // --- 設定項目 ---
+        // あなたのmicroCMSのサービスドメイン（例: 'your-service-id'）
+        const SERVICE_DOMAIN = 'anicure-dev'; 
+        // あなたのmicroCMSのAPIキー（例: 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'）
+        const API_KEY = '89b2759d3aa84128a5726ccf46c4fa605b07';
+        // あなたが作成したAPIのエンドポイント名（例: 'blog', 'news'）
+        const API_ENDPOINT = 'articles';
+        // プレビューするリッチエディタまたはMarkdown形式のフィールドID（例: 'body', 'content'）
+        const CONTENT_FIELD_ID = 'body';
+        // タイトル用のフィールドID（例: 'title'）
+        const TITLE_FIELD_ID = 'title';
+
+        // microCMSのクライアントを初期化
+        const client = microcms.createClient({
+            serviceDomain: SERVICE_DOMAIN,
+            apiKey: API_KEY,
+        });
+
+        // ページの読み込みが完了したら処理を開始
+        document.addEventListener('DOMContentLoaded', async () => {
+            const titleElement = document.getElementById('article-title');
+            const bodyElement = document.getElementById('article-body');
+
+            try {
+                // 1. URLからクエリパラメータを取得
+                const params = new URLSearchParams(window.location.search);
+                const contentId = params.get('contentId');
+                const draftKey = params.get('draftKey');
+
+                if (!contentId || !draftKey) {
+                    throw new Error('プレビュー用のパラメータが見つかりません。');
+                }
+
+                // 2. microCMSから下書き記事を取得
+                const data = await client.get({
+                    endpoint: API_ENDPOINT,
+                    contentId: contentId,
+                    queries: { draftKey: draftKey },
+                });
+
+                // 3. 取得したデータを表示
+                // タイトルを設定
+                if (data[TITLE_FIELD_ID]) {
+                    titleElement.textContent = data[TITLE_FIELD_ID];
+                    titleElement.classList.remove('text-gray-400');
+                } else {
+                    titleElement.textContent = 'タイトルの取得に失敗しました';
+                }
+
+                // 本文（Markdown）をHTMLに変換して設定
+                if (data[CONTENT_FIELD_ID]) {
+                    bodyElement.innerHTML = marked.parse(data[CONTENT_FIELD_ID]);
+                } else {
+                    bodyElement.innerHTML = '<p>本文の取得に失敗しました。フィールドIDが正しいか確認してください。</p>';
+                }
+
+            } catch (error) {
+                console.error('プレビューの読み込みに失敗しました:', error);
+                titleElement.textContent = 'エラーが発生しました';
+                bodyElement.innerHTML = `<p>プレビューの読み込みに失敗しました。</p><p class="text-sm text-red-600">エラー内容: ${error.message}</p><p class="text-sm mt-4">設定項目（サービスドメイン、APIキー、エンドポイント名など）が正しいか確認してください。</p>`;
+            }
+        });
+    </script>
+</body>
+</html>
