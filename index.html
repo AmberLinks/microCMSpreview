@@ -152,20 +152,19 @@
         const API_KEY = '89b2759d3aa84128a5726ccf46c4fa605b07';
         const API_ENDPOINT = 'articles';
         
-        // --- フィールドIDの設定（ご自身のAPIスキーマに合わせてください） ---
+        // --- フィールドIDの設定 ---
         const TITLE_FIELD_ID = 'title';
         const DESCRIPTION_FIELD_ID = 'description';
         const BODY_FIELD_ID = 'body';
         const SUPERVISOR_FIELD_ID = 'supervisor';
-        const PUBLISHED_AT_FIELD_ID = 'publishedAt'; // microCMSのデフォルトフィールド
-        // --- 設定はここまで ---
+        const PUBLISHED_AT_FIELD_ID = 'publishedAt';
 
         const client = microcms.createClient({
             serviceDomain: SERVICE_DOMAIN,
             apiKey: API_KEY,
         });
 
-        // 目次を生成する関数 (★ここに追加)
+        // 目次を生成する関数
         const createTableOfContents = (bodyElement) => {
             const tocContainer = document.getElementById('toc-container');
             const tocList = document.getElementById('table-of-contents');
