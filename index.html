@@ -20,6 +20,9 @@
     
     <style>
         /* 日本語フォントと基本的なスタイルを適用 */
+        html {
+            scroll-behavior: smooth; /* スムーズスクロールを有効化 */
+        }
         body {
             font-family: 'Noto Sans JP', sans-serif;
             -webkit-font-smoothing: antialiased;
@@ -98,6 +101,14 @@
             color: #6b7280;
             margin-bottom: 1.25rem;
         }
+        /* 目次リンクのスタイル */
+        #table-of-contents a {
+            color: #374151;
+            text-decoration: none;
+        }
+        #table-of-contents a:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body class="bg-gray-50">
@@ -111,6 +122,15 @@
                     <time id="article-published-at" class="block mt-4 text-gray-500 text-base"></time>
                     <p id="article-description" class="mt-6 text-gray-700 text-base leading-relaxed"></p>
                 </div>
+            </div>
+
+            <!-- 目次 (ここに追加) -->
+            <div id="toc-container" class="not-prose hidden mb-12 p-6 bg-gray-50 rounded-lg border">
+                <h2 class="text-lg font-bold mb-4 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7" /></svg>
+                    目次
+                </h2>
+                <ol id="table-of-contents" class="space-y-2"></ol>
             </div>
             
             <!-- 本文 -->
@@ -144,6 +164,42 @@
             serviceDomain: SERVICE_DOMAIN,
             apiKey: API_KEY,
         });
+
+        // 目次を生成する関数 (★ここに追加)
+        const createTableOfContents = (bodyElement) => {
+            const tocContainer = document.getElementById('toc-container');
+            const tocList = document.getElementById('table-of-contents');
+            tocList.innerHTML = ''; // 既存の目次をクリア
+
+            const headings = bodyElement.querySelectorAll('h2, h3');
+
+            if (headings.length === 0) {
+                tocContainer.classList.add('hidden');
+                return;
+            }
+
+            headings.forEach((heading, index) => {
+                const id = `toc-${index}`;
+                heading.id = id;
+
+                const li = document.createElement('li');
+                const a = document.createElement('a');
+                a.href = `#${id}`;
+                a.textContent = heading.textContent;
+
+                // h2かh3かでスタイルを調整
+                if (heading.tagName === 'H2') {
+                    li.classList.add('font-semibold', 'text-gray-700');
+                } else if (heading.tagName === 'H3') {
+                    li.classList.add('ml-4', 'text-gray-600');
+                }
+
+                li.appendChild(a);
+                tocList.appendChild(li);
+            });
+            
+            tocContainer.classList.remove('hidden');
+        };
 
         document.addEventListener('DOMContentLoaded', async () => {
             const titleElement = document.getElementById('article-title');
@@ -193,34 +249,33 @@
                 if (data[BODY_FIELD_ID]) {
                     bodyElement.innerHTML = marked.parse(data[BODY_FIELD_ID]);
                     bodyElement.classList.remove('text-gray-400');
+                    
+                    // ★本文がレンダリングされた後に目次を生成
+                    createTableOfContents(bodyElement);
+
                 } else {
                     bodyElement.innerHTML = '<p>本文の取得に失敗しました。フィールドIDが正しいか確認してください。</p>';
                 }
 
-                // 5. 監修者を設定 (★デバッグ機能を追加して修正しました)
+                // 5. 監修者を設定
                 if (data[SUPERVISOR_FIELD_ID]) {
                     const supervisorData = data[SUPERVISOR_FIELD_ID];
                     let supervisorName = '';
 
-                    // supervisorDataが存在し、オブジェクト形式の場合 (コンテンツ参照)
                     if (typeof supervisorData === 'object' && supervisorData !== null) {
-                        // 一般的な名前フィールドを試す (name, titleなど)
                         if (supervisorData.name) {
                             supervisorName = supervisorData.name;
-                        } else if (supervisorData.title) { // 'title'フィールドも試す
+                        } else if (supervisorData.title) {
                             supervisorName = supervisorData.title;
                         } else {
-                            // オブジェクトの構造をコンソールに出力してデバッグしやすくする
                             console.log('監修者オブジェクトの内容:', supervisorData);
-                            supervisorName = '監修者名の取得に失敗しました (詳細はコンソールを確認)';
+                            supervisorName = '監修者名の取得に失敗 (詳細はコンソールを確認)';
                         }
                     } 
-                    // supervisorDataが単純なテキストの場合
                     else if (typeof supervisorData === 'string') {
                         supervisorName = supervisorData;
                     }
 
-                    // 監修者名が取得できた場合のみ表示
                     if (supervisorName) {
                         supervisorElement.textContent = supervisorName;
                         supervisorContainer.classList.remove('hidden');
