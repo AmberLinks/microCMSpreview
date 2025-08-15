@@ -197,16 +197,25 @@
                     bodyElement.innerHTML = '<p>本文の取得に失敗しました。フィールドIDが正しいか確認してください。</p>';
                 }
 
-                // 5. 監修者を設定 (★ここを修正しました)
+                // 5. 監修者を設定 (★デバッグ機能を追加して修正しました)
                 if (data[SUPERVISOR_FIELD_ID]) {
                     const supervisorData = data[SUPERVISOR_FIELD_ID];
                     let supervisorName = '';
 
-                    // supervisorがオブジェクトでnameプロパティを持つ場合 (コンテンツ参照)
-                    if (typeof supervisorData === 'object' && supervisorData !== null && supervisorData.name) {
-                        supervisorName = supervisorData.name;
+                    // supervisorDataが存在し、オブジェクト形式の場合 (コンテンツ参照)
+                    if (typeof supervisorData === 'object' && supervisorData !== null) {
+                        // 一般的な名前フィールドを試す (name, titleなど)
+                        if (supervisorData.name) {
+                            supervisorName = supervisorData.name;
+                        } else if (supervisorData.title) { // 'title'フィールドも試す
+                            supervisorName = supervisorData.title;
+                        } else {
+                            // オブジェクトの構造をコンソールに出力してデバッグしやすくする
+                            console.log('監修者オブジェクトの内容:', supervisorData);
+                            supervisorName = '監修者名の取得に失敗しました (詳細はコンソールを確認)';
+                        }
                     } 
-                    // supervisorが単純なテキストの場合
+                    // supervisorDataが単純なテキストの場合
                     else if (typeof supervisorData === 'string') {
                         supervisorName = supervisorData;
                     }
