@@ -29,22 +29,29 @@
       color: #1f2937;
     }
 
+    /* 本文のタイポ＆要素 */
     .article-prose p { line-height: 2; margin: 1.1rem 0; }
     .article-prose a { color: #2563eb; text-decoration: underline; }
     .article-prose ul { list-style: disc; padding-left: 1.25rem; margin: 1rem 0; }
     .article-prose ol { list-style: decimal; padding-left: 1.25rem; margin: 1rem 0; }
-    .article-prose strong { font-weight: 700; }
-    .article-prose img { max-width: 100%; height: auto; }
+    .article-prose strong { font-weight: 800; }
+    .article-prose img { max-width: 100%; height: auto; border-radius: .375rem; }
+    .article-prose blockquote {
+      margin: 1.25rem 0; padding: .75rem 1rem;
+      background: #f3f4f6; border-left: 4px solid #9ca3af; border-radius: .375rem;
+      color: #374151;
+    }
 
+    /* H2/H3 の見た目（スクショ準拠） */
     .section-h2 {
       font-size: clamp(1.25rem, 2.2vw, 1.75rem);
       font-weight: 900;
       margin-top: 3rem;
       margin-bottom: 1.25rem;
       padding: .9rem 1rem;
-      background: #eef2ff;
-      color: #1e3a8a;
-      border-left: .5rem solid #4f46e5;
+      background: #eef2ff;      /* 薄いパープルの帯 */
+      color: #1e3a8a;           /* 濃い藍色 */
+      border-left: .5rem solid #4f46e5; /* 左帯 */
       border-radius: .5rem;
     }
     .section-h3 {
@@ -53,8 +60,11 @@
       margin-top: 2.25rem;
       margin-bottom: .75rem;
       padding-bottom: .5rem;
-      border-bottom: 2px solid #e5e7eb;
+      border-bottom: 2px solid #e5e7eb; /* 下線 */
+      color: #111827;
     }
+
+    /* 「まとめ」帯（黒っぽい左帯で強調） */
     .summary-band {
       font-size: clamp(1.25rem, 2.2vw, 1.6rem);
       font-weight: 900;
@@ -66,13 +76,16 @@
       border-left: .6rem solid #111827;
       border-radius: .5rem;
     }
+
+    /* 目次（グレイのカード＋箇条書き） */
+    #table-of-contents li { line-height: 1.7; }
     #table-of-contents a:hover { text-decoration: underline; }
     h2[id], h3[id] { scroll-margin-top: 96px; }
   </style>
 </head>
 <body class="min-h-screen">
 
-  <!-- 固定ヘッダー -->
+  <!-- 固定ヘッダー（薄い区切りのみ） -->
   <header class="bg-white/90 backdrop-blur sticky top-0 z-40 border-b border-gray-200">
     <div class="mx-auto max-w-6xl px-4 py-3">
       <div class="flex items-center justify-between">
@@ -85,7 +98,7 @@
   <!-- Main -->
   <main class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
 
-    <!-- タイトル・日付・概要 -->
+    <!-- タイトル・日付・概要（スクショ準拠の余白・段組） -->
     <section class="mb-8 sm:mb-10">
       <div class="bg-white rounded-2xl shadow-sm ring-1 ring-gray-100">
         <div class="px-5 sm:px-8 pt-7 pb-6 sm:pb-7">
@@ -98,13 +111,12 @@
               <time id="article-updated-at" class="block text-sm text-gray-500"></time>
             </div>
           </div>
-
           <p id="article-description" class="mt-5 text-gray-700 text-base sm:text-lg leading-8"></p>
         </div>
       </div>
     </section>
 
-    <!-- 目次 -->
+    <!-- 目次（灰カード＋丸ポチ） -->
     <aside id="toc-container" class="hidden mb-10">
       <div class="bg-white rounded-2xl shadow-sm ring-1 ring-gray-100 p-5 sm:p-6">
         <h2 class="text-base font-bold mb-3 flex items-center text-indigo-800">
@@ -113,17 +125,17 @@
           </svg>
           目次
         </h2>
-        <ol id="table-of-contents" class="space-y-2 text-[15px]"></ol>
+        <ul id="table-of-contents" class="space-y-2 text-[15px]"></ul>
       </div>
     </aside>
 
-    <!-- 本文 -->
+    <!-- 本文（Markdown 全投入） -->
     <article id="article-container" class="bg-white rounded-2xl shadow-sm ring-1 ring-gray-100 p-5 sm:p-8 md:p-10">
       <div id="article-body" class="article-prose text-gray-700">
-        <p>microCMSからプレビューデータを取得しています。しばらくお待ちください。</p>
+        <p>microCMSからプレビューデータを取得しています。</p>
       </div>
 
-      <!-- 著者 -->
+      <!-- 著者（任意） -->
       <section id="article-author-container" class="hidden mt-14 pt-8 border-t border-gray-200">
         <div class="flex items-start gap-5">
           <img id="author-avatar" src="" alt="著者アイコン"
@@ -138,14 +150,14 @@
         </div>
       </section>
 
-      <!-- 監修（任意） -->
-      <section id="article-supervisor-container" class="hidden mt-10">
-        <div class="mt-8 p-6 rounded-xl bg-gray-50">
+      <!-- 監修カード（スクショ風：ラベル=監修獣医師、薄グレー枠カード） -->
+      <section id="article-supervisor-container" class="hidden mt-12">
+        <div class="mt-2 p-6 rounded-xl bg-gray-50 border border-gray-200">
           <div class="flex items-start gap-5">
             <img id="supervisor-icon" src="" alt="監修者アイコン"
-                 class="h-16 w-16 rounded-full object-cover border-4 border-white shadow-md"/>
+                 class="h-20 w-20 rounded-xl object-cover border-4 border-white shadow-md"/>
             <div class="flex-1">
-              <p id="supervisor-label" class="text-xs font-semibold text-gray-600 tracking-wide">監修</p>
+              <p id="supervisor-label" class="text-xs font-semibold text-gray-600 tracking-wide">監修獣医師</p>
               <h3 id="supervisor-name" class="text-lg font-bold text-gray-900 mt-1"></h3>
               <p id="supervisor-description" class="text-sm text-gray-700 mt-2 leading-7"></p>
               <a id="supervisor-link" href="#" target="_blank" rel="noopener"
@@ -155,9 +167,8 @@
         </div>
       </section>
 
-      <!-- パラメータ未検出のヒントを表示する領域 -->
+      <!-- プレビュー・ヒント -->
       <div id="preview-hint" class="hidden mt-10 p-4 rounded-lg border border-amber-300 bg-amber-50 text-amber-900 text-sm"></div>
-
     </article>
 
     <div class="h-6"></div>
@@ -170,50 +181,47 @@
   </footer>
 
   <script>
-    // ====== 設定 ======
-    const SERVICE_DOMAIN = 'anicure-dev';
-    const API_KEY        = '89b2759d3aa84128a5726ccf46c4fa605b07';
+    // ====== 設定（必要に応じて編集） ======
+    const SERVICE_DOMAIN   = 'anicure-dev';
+    const API_KEY          = '89b2759d3aa84128a5726ccf46c4fa605b07';
     const ARTICLE_ENDPOINT = 'articles';
 
-    // 想定フィールド（必要に応じて変更）
+    // 想定フィールド
     const FIELD = {
       title:        'title',
       description:  'description',
-      body:         'body',
+      body:         'body',          // ← 本文は Markdown をそのまま利用
       publishedAt:  'publishedAt',
-      updatedAt:    'updatedAt',         // microCMS デフォの更新日時
-      author:       ['author', 'writer'], // どちらか存在する方
+      updatedAt:    'updatedAt',
+      author:       ['author','writer'], // どちらか存在する方
       supervisor:   'supervisor'
     };
 
     // 著者/監修の候補キー
     const AUTHOR_FIELD = {
-      name:        ['name', 'authorName'],
-      bio:         ['bio', 'profile', 'description'],
-      avatarUrl:   ['avatar', 'icon', 'thumbnail'],
-      profileUrl:  ['profileUrl', 'url', 'link']
+      name:        ['name','authorName'],
+      bio:         ['bio','profile','description'],
+      avatarUrl:   ['avatar','icon','thumbnail'],
+      profileUrl:  ['profileUrl','url','link']
     };
     const SUPERVISOR_FIELD = {
       name:        ['name'],
-      roleArray:   ['role', 'roles', 'anicureRole'],
-      desc:        ['description', 'bio', 'anicureDescription'],
-      avatarUrl:   ['avatar', 'icon', 'thumbnail', 'anicureThumbnail'],
-      profileUrl:  ['profileUrl', 'url', 'anicureProfileUrl']
+      roleArray:   ['role','roles','anicureRole'],
+      desc:        ['description','bio','anicureDescription'],
+      avatarUrl:   ['avatar','icon','thumbnail','anicureThumbnail'],
+      profileUrl:  ['profileUrl','url','anicureProfileUrl']
     };
 
     // microCMS client
     const client = microcms.createClient({ serviceDomain: SERVICE_DOMAIN, apiKey: API_KEY });
 
-    // ========= ここが重要：プレビュー用パラメータ解決 =========
+    // ========= プレビュー用パラメータ解決 =========
     function resolvePreviewParams() {
       const res = { contentId: '', draftKey: '' };
-
-      // 1) クエリ
       const q = new URLSearchParams(window.location.search);
       res.contentId = q.get('contentId') || q.get('id') || '';
       res.draftKey  = q.get('draftKey')  || '';
 
-      // 2) ハッシュ（#contentId=...&draftKey=...）
       if (!res.contentId || !res.draftKey) {
         const hash = window.location.hash?.replace(/^#/, '') || '';
         if (hash) {
@@ -222,15 +230,10 @@
           res.draftKey  = res.draftKey  || h.get('draftKey')  || '';
         }
       }
-
-      // 3) パス（/articles/＜id＞ もしくは 末尾の＜id＞）
       if (!res.contentId) {
         const path = window.location.pathname || '';
-        // /.../articles/ID の ID を拾う
         const m1 = path.match(/\/articles\/([^\/?#]+)/i);
         if (m1 && m1[1] && !m1[1].endsWith('.html')) res.contentId = m1[1];
-
-        // 末尾が id の場合（index.html などを除外）
         if (!res.contentId) {
           const tail = path.split('/').filter(Boolean).pop();
           if (tail && !tail.endsWith('.html') && !tail.endsWith('.htm')) res.contentId = tail;
@@ -240,17 +243,11 @@
     }
 
     // ===== ユーティリティ =====
-    const getFirst = (obj, keys) => {
-      for (const k of keys) { const v = obj?.[k]; if (v !== undefined && v !== null) return v; }
-      return undefined;
-    };
+    const getFirst = (obj, keys) => { for (const k of keys) { const v = obj?.[k]; if (v !== undefined && v !== null) return v; } };
     const getImageUrl = (maybe) => (typeof maybe === 'string') ? maybe : (maybe?.url || '');
-    const formatYMD = (dStr) => {
-      try {
-        const d = new Date(dStr);
-        return `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;
-      } catch { return ''; }
-    };
+    const fmtYMD = (dStr) => { try { const d = new Date(dStr); return `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`; } catch { return ''; } };
+
+    // H2/H3・まとめ帯の装飾
     const decorateHeadings = (rootEl) => {
       rootEl.querySelectorAll('h2').forEach(h => {
         const t = (h.textContent || '').trim();
@@ -259,6 +256,8 @@
       });
       rootEl.querySelectorAll('h3').forEach(h => h.classList.add('section-h3'));
     };
+
+    // 目次（箇条書き）
     const createToc = (el) => {
       const tocWrap = document.getElementById('toc-container');
       const toc = document.getElementById('table-of-contents');
@@ -292,18 +291,16 @@
         const { contentId, draftKey } = resolvePreviewParams();
 
         if (!contentId || !draftKey) {
-          // 落とさず、ヒントだけ表示
           hintEl.classList.remove('hidden');
           hintEl.innerHTML =
             'プレビュー用のパラメータが検出できませんでした。microCMS 管理画面の「プレビューURL」を<br>' +
-            '<code>https://あなたのドメイン/path/preview.html?contentId={id}&draftKey={draftKey}</code><br>' +
+            '<code>https://your-domain/path/preview.html?contentId={id}&draftKey={draftKey}</code><br>' +
             'の形式に設定してください。<br>' +
-            '※ ハッシュ（#contentId=...&draftKey=...）や <code>/articles/{id}</code> パスにも対応しています。';
-          // ここで return せず、以降は何もしない
+            '※ ハッシュ（<code>#contentId=...&draftKey=...</code>）や <code>/articles/{id}</code> パスにも対応。';
           return;
         }
 
-        // 記事データ取得
+        // 記事データ
         const article = await client.get({
           endpoint: ARTICLE_ENDPOINT,
           contentId,
@@ -312,13 +309,13 @@
 
         // タイトル/日付/概要
         titleEl.textContent = article[FIELD.title] || 'タイトル未設定';
-        if (article[FIELD.publishedAt]) pubEl.textContent = `公開日: ${formatYMD(article[FIELD.publishedAt])}`;
-        if (article[FIELD.updatedAt])   updEl.textContent = `更新日: ${formatYMD(article[FIELD.updatedAt])}`;
+        if (article[FIELD.publishedAt]) pubEl.textContent = `公開日: ${fmtYMD(article[FIELD.publishedAt])}`;
+        if (article[FIELD.updatedAt])   updEl.textContent = `更新日: ${fmtYMD(article[FIELD.updatedAt])}`;
         descEl.textContent = article[FIELD.description] || '';
 
-        // 本文
+        // 本文（Markdown をそのままレンダリング）
         if (article[FIELD.body]) {
-          bodyEl.innerHTML = marked.parse(article[FIELD.body]);
+          bodyEl.innerHTML = marked.parse(article[FIELD.body], { breaks: true });
           decorateHeadings(bodyEl);
           createToc(bodyEl);
         } else {
@@ -329,7 +326,7 @@
         const authorKey = Array.isArray(FIELD.author) ? FIELD.author.find(k => !!article[k]) : FIELD.author;
         if (authorKey && article[authorKey]?.id) {
           const author = await client.get({ endpoint: authorKey, contentId: article[authorKey].id });
-          const authorBox = document.getElementById('article-author-container');
+          const box = document.getElementById('article-author-container');
           const avatarEl  = document.getElementById('author-avatar');
           const nameEl    = document.getElementById('author-name');
           const bioEl     = document.getElementById('author-bio');
@@ -345,13 +342,12 @@
           bioEl.textContent  = bio;
           if (url) linkEl.href = url; else linkEl.classList.add('pointer-events-none','opacity-40');
 
-          authorBox.classList.remove('hidden');
+          box.classList.remove('hidden');
         }
 
         // 監修（任意）
         if (article[FIELD.supervisor]?.id) {
           const sup = await client.get({ endpoint: FIELD.supervisor, contentId: article[FIELD.supervisor].id });
-
           const containerEl = document.getElementById('article-supervisor-container');
           const iconEl = document.getElementById('supervisor-icon');
           const labelEl= document.getElementById('supervisor-label');
@@ -359,8 +355,7 @@
           const descEl2= document.getElementById('supervisor-description');
           const linkEl = document.getElementById('supervisor-link');
 
-          const roleArr = getFirst(sup, SUPERVISOR_FIELD.roleArray);
-          labelEl.textContent = Array.isArray(roleArr) && roleArr.length ? roleArr.join(' / ') : '監修';
+          labelEl.textContent = '監修獣医師';
           nameEl.textContent  = getFirst(sup, SUPERVISOR_FIELD.name) || '';
           descEl2.textContent = getFirst(sup, SUPERVISOR_FIELD.desc) || '';
 
