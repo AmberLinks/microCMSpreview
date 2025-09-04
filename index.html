@@ -4,20 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>microCMS プレビュー</title>
-    
-    <!-- Tailwind CSS: スタイリング用 -->
+
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- marked.js: MarkdownをHTMLに変換するライブラリ -->
+
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
-    <!-- microCMS JavaScript SDK: microCMSからデータを取得するためのライブラリ -->
     <script src="https://unpkg.com/microcms-js-sdk@latest/dist/umd/microcms-js-sdk.js"></script>
-    
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic" crossorigin>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
-    
+
     <style>
         /* 日本語フォントと基本的なスタイルを適用 */
         html {
@@ -28,6 +25,7 @@
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
             color: #333; /* 基本の文字色を濃いグレーに */
+            background-color: #f9fafb; /* 背景色を少しグレーに */
         }
 
         /* Markdownから変換されたHTML要素のスタイル調整 */
@@ -36,7 +34,7 @@
             line-height: 2.5rem;
             font-weight: 700;
             color: #1f2937; /* text-gray-800 */
-            margin-bottom: 0.75rem; /* 12px */
+            margin-bottom: 0.75rem;
             padding-bottom: 0;
             border-bottom: none;
         }
@@ -51,10 +49,10 @@
             font-size: 1.5rem; /* text-2xl */
             font-weight: 700;
             color: #111827; /* text-gray-900 */
-            margin-top: 3rem;
+            margin-top: 3.5rem;
             margin-bottom: 1.5rem;
             padding-left: 1rem;
-            border-left: 5px solid #60a5fa; /* A nice blue color */
+            border-left: 5px solid #3b82f6; /* Blue-500 */
             border-bottom: none;
         }
 
@@ -62,96 +60,104 @@
             font-size: 1.25rem; /* text-xl */
             font-weight: 700;
             color: #111827; /* text-gray-900 */
-            margin-top: 2.5rem;
+            margin-top: 3rem;
             margin-bottom: 1rem;
-            padding-bottom: 0.25rem;
-            border-bottom: 1px solid #e5e7eb; /* border-gray-200 */
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #e5e7eb; /* border-gray-200 */
         }
 
         .prose p {
             font-size: 1rem;
-            line-height: 1.9;
-            margin-bottom: 1.25rem;
+            line-height: 2; /* 行間を広げて読みやすく */
+            margin-bottom: 1.5rem;
         }
 
         .prose ul {
             list-style-type: disc;
             padding-left: 1.75rem;
-            margin-bottom: 1.25rem;
+            margin-bottom: 1.5rem;
         }
 
         .prose li {
             margin-bottom: 0.75rem;
-            line-height: 1.9;
+            line-height: 2;
         }
 
         .prose strong {
             font-weight: 700;
-            color: #111827; /* text-gray-900 */
+            color: #111827;
         }
 
         .prose a {
             color: #2563eb; /* blue-600 */
             text-decoration: underline;
+            transition: color 0.2s;
         }
-        
+        .prose a:hover {
+            color: #1d4ed8; /* blue-700 */
+        }
+
         .prose blockquote {
             border-left: 4px solid #d1d5db;
             padding-left: 1rem;
-            color: #6b7280;
-            margin-bottom: 1.25rem;
-        }
-        /* 目次リンクのスタイル */
-        #table-of-contents a {
-            color: #374151;
-            text-decoration: none;
-        }
-        #table-of-contents a:hover {
-            text-decoration: underline;
+            color: #4b5563; /* 少し濃いグレーに */
+            margin-bottom: 1.5rem;
+            font-style: italic;
         }
     </style>
 </head>
-<body class="bg-gray-50">
+<body class="text-gray-800">
 
-    <main class="container mx-auto max-w-4xl px-4 py-8 sm:py-12">
-        <article id="article-container" class="prose max-w-none bg-white p-6 sm:p-8 md:p-12 rounded-lg shadow-md">
-            <!-- タイトル、公開日、概要 -->
+    <header class="bg-white shadow-sm sticky top-0 z-10">
+        <div class="container mx-auto max-w-5xl px-4 py-4">
+            <h1 class="text-xl font-bold text-gray-700">記事プレビュー</h1>
+        </div>
+    </header>
+
+    <main class="container mx-auto max-w-4xl px-4 py-8 sm:py-16">
+        <article id="article-container" class="prose max-w-none bg-white p-6 sm:p-10 md:p-12 rounded-xl shadow-lg">
             <div class="not-prose mb-10 pb-8 border-b border-gray-200">
                 <div id="article-meta">
-                    <h1 id="article-title" class="text-gray-400">データを読み込み中...</h1>
+                    <h1 id="article-title" class="text-gray-400 text-3xl md:text-4xl font-bold">データを読み込み中...</h1>
                     <time id="article-published-at" class="block mt-4 text-gray-500 text-base"></time>
-                    <p id="article-description" class="mt-6 text-gray-700 text-base leading-relaxed"></p>
+                    <p id="article-description" class="mt-6 text-gray-600 text-lg leading-relaxed"></p>
                 </div>
             </div>
 
-            <!-- 目次 (ここに追加) -->
-            <div id="toc-container" class="not-prose hidden mb-12 p-6 bg-gray-50 rounded-lg border">
-                <h2 class="text-lg font-bold mb-4 flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7" /></svg>
+            <div id="toc-container" class="not-prose hidden mb-12 p-6 bg-blue-50 border border-blue-200 rounded-lg">
+                <h2 class="text-lg font-bold mb-4 flex items-center text-blue-800">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7" /></svg>
                     目次
                 </h2>
                 <ol id="table-of-contents" class="space-y-2"></ol>
             </div>
-            
-            <!-- 本文 -->
+
             <div id="article-body" class="text-gray-400">
                 <p>microCMSからプレビューデータを取得しています。しばらくお待ちください。</p>
             </div>
 
-            <!-- 監修者 -->
-            <div id="article-supervisor-container" class="hidden mt-12 pt-6 border-t border-gray-200">
-                <p class="text-sm text-gray-600">監修</p>
-                <p id="article-supervisor" class="text-base font-bold text-gray-800 mt-1"></p>
+            <div id="article-supervisor-container" class="hidden not-prose mt-16 pt-8 border-t border-gray-200">
+                <div class="bg-gray-50 p-6 rounded-lg">
+                    <p class="text-sm text-gray-500 mb-2">この記事の監修者</p>
+                    <p id="article-supervisor" class="text-xl font-bold text-gray-800"></p>
+                </div>
             </div>
         </article>
     </main>
 
+    <footer class="bg-gray-800 text-white mt-16 py-6">
+        <div class="container mx-auto max-w-5xl px-4 text-center text-sm">
+            &copy; 2023 My Website. All Rights Reserved.
+        </div>
+    </footer>
+
+
     <script>
         // --- 設定項目 ---
-        const SERVICE_DOMAIN = 'anicure-dev'; 
+        const SERVICE_DOMAIN = 'anicure-dev';
         const API_KEY = '89b2759d3aa84128a5726ccf46c4fa605b07';
         const API_ENDPOINT = 'articles';
-        
+
         // --- フィールドIDの設定 ---
         const TITLE_FIELD_ID = 'title';
         const DESCRIPTION_FIELD_ID = 'description';
@@ -185,18 +191,19 @@
                 const a = document.createElement('a');
                 a.href = `#${id}`;
                 a.textContent = heading.textContent;
+                a.className = "hover:underline transition-colors";
 
                 // h2かh3かでスタイルを調整
                 if (heading.tagName === 'H2') {
-                    li.classList.add('font-semibold', 'text-gray-700');
+                    li.classList.add('font-semibold', 'text-blue-700');
                 } else if (heading.tagName === 'H3') {
-                    li.classList.add('ml-4', 'text-gray-600');
+                    li.classList.add('ml-4', 'text-blue-600');
                 }
 
                 li.appendChild(a);
                 tocList.appendChild(li);
             });
-            
+
             tocContainer.classList.remove('hidden');
         };
 
@@ -226,6 +233,7 @@
                 // 1. タイトルを設定
                 if (data[TITLE_FIELD_ID]) {
                     titleElement.textContent = data[TITLE_FIELD_ID];
+                    document.title = `${data[TITLE_FIELD_ID]} | microCMS プレビュー`;
                     titleElement.classList.remove('text-gray-400');
                 } else {
                     titleElement.textContent = 'タイトルの取得に失敗';
@@ -248,10 +256,9 @@
                 if (data[BODY_FIELD_ID]) {
                     bodyElement.innerHTML = marked.parse(data[BODY_FIELD_ID]);
                     bodyElement.classList.remove('text-gray-400');
-                    
-                    // ★本文がレンダリングされた後に目次を生成
-                    createTableOfContents(bodyElement);
 
+                    // 本文がレンダリングされた後に目次を生成
+                    createTableOfContents(bodyElement);
                 } else {
                     bodyElement.innerHTML = '<p>本文の取得に失敗しました。フィールドIDが正しいか確認してください。</p>';
                 }
@@ -262,16 +269,9 @@
                     let supervisorName = '';
 
                     if (typeof supervisorData === 'object' && supervisorData !== null) {
-                        if (supervisorData.name) {
-                            supervisorName = supervisorData.name;
-                        } else if (supervisorData.title) {
-                            supervisorName = supervisorData.title;
-                        } else {
-                            console.log('監修者オブジェクトの内容:', supervisorData);
-                            supervisorName = '監修者名の取得に失敗 (詳細はコンソールを確認)';
-                        }
-                    } 
-                    else if (typeof supervisorData === 'string') {
+                         // APIのレスポンスに合わせて 'name' または 'title' を使用
+                        supervisorName = supervisorData.name || supervisorData.title || '監修者名の取得に失敗';
+                    } else if (typeof supervisorData === 'string') {
                         supervisorName = supervisorData;
                     }
 
@@ -283,8 +283,14 @@
 
             } catch (error) {
                 console.error('プレビューの読み込みに失敗しました:', error);
-                titleElement.textContent = 'エラーが発生しました';
-                bodyElement.innerHTML = `<p>プレビューの読み込みに失敗しました。</p><p class="text-sm text-red-600">エラー内容: ${error.message}</p><p class="text-sm mt-4">設定項目（サービスドメイン、APIキー、エンドポイント名、各フィールドID）が正しいか確認してください。</p>`;
+                const articleContainer = document.getElementById('article-container');
+                articleContainer.innerHTML = `
+                    <div class="text-center">
+                        <h1 class="text-2xl font-bold text-red-600">エラーが発生しました</h1>
+                        <p class="mt-4">プレビューの読み込みに失敗しました。</p>
+                        <p class="mt-2 text-sm text-red-500 bg-red-50 p-4 rounded-md">エラー内容: ${error.message}</p>
+                        <p class="mt-6 text-sm text-gray-600">設定項目（サービスドメイン、APIキー、エンドポイント名、各フィールドID）が正しいか確認してください。</p>
+                    </div>`;
             }
         });
     </script>
