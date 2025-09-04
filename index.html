@@ -16,94 +16,32 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
 
     <style>
-        /* 日本語フォントと基本的なスタイルを適用 */
-        html {
-            scroll-behavior: smooth; /* スムーズスクロールを有効化 */
-        }
+        html { scroll-behavior: smooth; }
         body {
             font-family: 'Noto Sans JP', sans-serif;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
-            color: #333; /* 基本の文字色を濃いグレーに */
-            background-color: #f9fafb; /* 背景色を少しグレーに */
+            color: #333;
+            background-color: #f9fafb;
         }
-
-        /* Markdownから変換されたHTML要素のスタイル調整 */
-        .prose h1 {
-            font-size: 1.875rem; /* text-3xl */
-            line-height: 2.5rem;
-            font-weight: 700;
-            color: #1f2937; /* text-gray-800 */
-            margin-bottom: 0.75rem;
-            padding-bottom: 0;
-            border-bottom: none;
-        }
-        @media (min-width: 768px) {
-            .prose h1 {
-                font-size: 2.25rem; /* md:text-4xl */
-                line-height: 2.75rem;
-            }
-        }
-
         .prose h2 {
-            font-size: 1.5rem; /* text-2xl */
+            font-size: 1.5rem;
             font-weight: 700;
-            color: #111827; /* text-gray-900 */
             margin-top: 3.5rem;
             margin-bottom: 1.5rem;
             padding-left: 1rem;
-            border-left: 5px solid #3b82f6; /* Blue-500 */
-            border-bottom: none;
+            border-left: 5px solid #3b82f6;
         }
-
         .prose h3 {
-            font-size: 1.25rem; /* text-xl */
+            font-size: 1.25rem;
             font-weight: 700;
-            color: #111827; /* text-gray-900 */
             margin-top: 3rem;
             margin-bottom: 1rem;
             padding-bottom: 0.5rem;
-            border-bottom: 2px solid #e5e7eb; /* border-gray-200 */
+            border-bottom: 2px solid #e5e7eb;
         }
-
-        .prose p {
-            font-size: 1rem;
-            line-height: 2; /* 行間を広げて読みやすく */
-            margin-bottom: 1.5rem;
-        }
-
-        .prose ul {
-            list-style-type: disc;
-            padding-left: 1.75rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .prose li {
-            margin-bottom: 0.75rem;
-            line-height: 2;
-        }
-
-        .prose strong {
-            font-weight: 700;
-            color: #111827;
-        }
-
-        .prose a {
-            color: #2563eb; /* blue-600 */
-            text-decoration: underline;
-            transition: color 0.2s;
-        }
-        .prose a:hover {
-            color: #1d4ed8; /* blue-700 */
-        }
-
-        .prose blockquote {
-            border-left: 4px solid #d1d5db;
-            padding-left: 1rem;
-            color: #4b5563; /* 少し濃いグレーに */
-            margin-bottom: 1.5rem;
-            font-style: italic;
-        }
+        .prose p { line-height: 2; }
+        .prose a { color: #2563eb; text-decoration: underline; }
     </style>
 </head>
 <body class="text-gray-800">
@@ -138,8 +76,19 @@
 
             <div id="article-supervisor-container" class="hidden not-prose mt-16 pt-8 border-t border-gray-200">
                 <div class="bg-gray-50 p-6 rounded-lg">
-                    <p class="text-sm text-gray-500 mb-2">この記事の監修者</p>
-                    <p id="article-supervisor" class="text-xl font-bold text-gray-800"></p>
+                    <div class="flex items-start space-x-6">
+                        <div class="flex-shrink-0">
+                            <img id="supervisor-icon" src="" alt="監修者アイコン" class="h-24 w-24 rounded-full object-cover border-4 border-white shadow-md">
+                        </div>
+                        <div class="flex-1">
+                            <p id="supervisor-label" class="text-sm font-semibold text-gray-600">この記事を監修した専門家</p>
+                            <h3 id="supervisor-name" class="text-xl font-bold text-gray-800 mt-1"></h3>
+                            <p id="supervisor-description" class="text-gray-700 mt-3 text-sm leading-relaxed"></p>
+                            <a id="supervisor-link" href="#" class="inline-block mt-4 text-sm font-semibold text-blue-600 hover:text-blue-800 transition-colors">
+                                詳しくはこちら &rarr;
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </article>
@@ -151,18 +100,19 @@
         </div>
     </footer>
 
-
     <script>
         // --- 設定項目 ---
         const SERVICE_DOMAIN = 'anicure-dev';
         const API_KEY = '89b2759d3aa84128a5726ccf46c4fa605b07';
-        const API_ENDPOINT = 'articles';
+        
+        const ARTICLE_ENDPOINT = 'articles';
+        const STAFF_ENDPOINT = 'staff'; // スタッフ情報のエンドポイント
 
         // --- フィールドIDの設定 ---
         const TITLE_FIELD_ID = 'title';
         const DESCRIPTION_FIELD_ID = 'description';
         const BODY_FIELD_ID = 'body';
-        const SUPERVISOR_FIELD_ID = 'supervisor';
+        const SUPERVISOR_FIELD_ID = 'supervisor'; // 記事内の監修者フィールドID
         const PUBLISHED_AT_FIELD_ID = 'publishedAt';
 
         const client = microcms.createClient({
@@ -170,40 +120,28 @@
             apiKey: API_KEY,
         });
 
-        // 目次を生成する関数
         const createTableOfContents = (bodyElement) => {
             const tocContainer = document.getElementById('toc-container');
             const tocList = document.getElementById('table-of-contents');
-            tocList.innerHTML = ''; // 既存の目次をクリア
-
+            tocList.innerHTML = '';
             const headings = bodyElement.querySelectorAll('h2, h3');
-
             if (headings.length === 0) {
                 tocContainer.classList.add('hidden');
                 return;
             }
-
             headings.forEach((heading, index) => {
                 const id = `toc-${index}`;
                 heading.id = id;
-
                 const li = document.createElement('li');
                 const a = document.createElement('a');
                 a.href = `#${id}`;
                 a.textContent = heading.textContent;
-                a.className = "hover:underline transition-colors";
-
-                // h2かh3かでスタイルを調整
-                if (heading.tagName === 'H2') {
-                    li.classList.add('font-semibold', 'text-blue-700');
-                } else if (heading.tagName === 'H3') {
-                    li.classList.add('ml-4', 'text-blue-600');
-                }
-
+                a.className = "hover:underline";
+                if (heading.tagName === 'H2') li.classList.add('font-semibold', 'text-blue-700');
+                else if (heading.tagName === 'H3') li.classList.add('ml-4', 'text-blue-600');
                 li.appendChild(a);
                 tocList.appendChild(li);
             });
-
             tocContainer.classList.remove('hidden');
         };
 
@@ -212,8 +150,6 @@
             const publishedAtElement = document.getElementById('article-published-at');
             const descriptionElement = document.getElementById('article-description');
             const bodyElement = document.getElementById('article-body');
-            const supervisorContainer = document.getElementById('article-supervisor-container');
-            const supervisorElement = document.getElementById('article-supervisor');
 
             try {
                 const params = new URLSearchParams(window.location.search);
@@ -224,73 +160,71 @@
                     throw new Error('プレビュー用のパラメータが見つかりません。');
                 }
 
-                const data = await client.get({
-                    endpoint: API_ENDPOINT,
+                // 1. 記事データを取得
+                const articleData = await client.get({
+                    endpoint: ARTICLE_ENDPOINT,
                     contentId: contentId,
                     queries: { draftKey: draftKey },
                 });
 
-                // 1. タイトルを設定
-                if (data[TITLE_FIELD_ID]) {
-                    titleElement.textContent = data[TITLE_FIELD_ID];
-                    document.title = `${data[TITLE_FIELD_ID]} | microCMS プレビュー`;
-                    titleElement.classList.remove('text-gray-400');
-                } else {
-                    titleElement.textContent = 'タイトルの取得に失敗';
+                // 記事の基本情報を設定
+                titleElement.textContent = articleData[TITLE_FIELD_ID] || 'タイトルの取得に失敗';
+                if(articleData[TITLE_FIELD_ID]) titleElement.classList.remove('text-gray-400');
+                
+                if (articleData[PUBLISHED_AT_FIELD_ID]) {
+                    const date = new Date(articleData[PUBLISHED_AT_FIELD_ID]);
+                    publishedAtElement.textContent = `公開日: ${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, '0')}.${String(date.getDate()).padStart(2, '0')}`;
                 }
-
-                // 2. 公開日を設定
-                if (data[PUBLISHED_AT_FIELD_ID]) {
-                    const date = new Date(data[PUBLISHED_AT_FIELD_ID]);
-                    const formattedDate = `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, '0')}.${String(date.getDate()).padStart(2, '0')}`;
-                    publishedAtElement.textContent = `公開日: ${formattedDate}`;
-                    publishedAtElement.setAttribute('datetime', data[PUBLISHED_AT_FIELD_ID]);
-                }
-
-                // 3. 概要を設定
-                if (data[DESCRIPTION_FIELD_ID]) {
-                    descriptionElement.textContent = data[DESCRIPTION_FIELD_ID];
-                }
-
-                // 4. 本文（Markdown）をHTMLに変換して設定
-                if (data[BODY_FIELD_ID]) {
-                    bodyElement.innerHTML = marked.parse(data[BODY_FIELD_ID]);
+                
+                descriptionElement.textContent = articleData[DESCRIPTION_FIELD_ID] || '';
+                
+                if (articleData[BODY_FIELD_ID]) {
+                    bodyElement.innerHTML = marked.parse(articleData[BODY_FIELD_ID]);
                     bodyElement.classList.remove('text-gray-400');
-
-                    // 本文がレンダリングされた後に目次を生成
                     createTableOfContents(bodyElement);
                 } else {
-                    bodyElement.innerHTML = '<p>本文の取得に失敗しました。フィールドIDが正しいか確認してください。</p>';
+                    bodyElement.innerHTML = '<p>本文の取得に失敗しました。</p>';
                 }
 
-                // 5. 監修者を設定
-                if (data[SUPERVISOR_FIELD_ID]) {
-                    const supervisorData = data[SUPERVISOR_FIELD_ID];
-                    let supervisorName = '';
+                // ★★★ 2. 監修者情報を取得して表示 ★★★
+                if (articleData[SUPERVISOR_FIELD_ID] && articleData[SUPERVISOR_FIELD_ID].id) {
+                    const supervisorId = articleData[SUPERVISOR_FIELD_ID].id;
 
-                    if (typeof supervisorData === 'object' && supervisorData !== null) {
-                         // APIのレスポンスに合わせて 'name' または 'title' を使用
-                        supervisorName = supervisorData.name || supervisorData.title || '監修者名の取得に失敗';
-                    } else if (typeof supervisorData === 'string') {
-                        supervisorName = supervisorData;
+                    // 記事データから取得したIDを使って、staffエンドポイントから詳細情報を取得
+                    const staffData = await client.get({
+                        endpoint: STAFF_ENDPOINT,
+                        contentId: supervisorId,
+                    });
+                    
+                    // 取得したデータをHTML要素にセット
+                    const supervisorContainer = document.getElementById('article-supervisor-container');
+                    const iconEl = document.getElementById('supervisor-icon');
+                    const labelEl = document.getElementById('supervisor-label');
+                    const nameEl = document.getElementById('supervisor-name');
+                    const descriptionEl = document.getElementById('supervisor-description');
+                    
+                    if (staffData.anicureThumbnail && staffData.anicureThumbnail.url) {
+                        iconEl.src = staffData.anicureThumbnail.url;
+                    }
+                    
+                    const role = (staffData.anicureRole && staffData.anicureRole.length > 0) ? staffData.anicureRole.join(' / ') : '';
+                    if(role) {
+                        labelEl.textContent = `この記事を監修した${role}`;
+                        nameEl.textContent = `${staffData.name || ''} ${role}`;
+                    } else {
+                        nameEl.textContent = staffData.name || '';
                     }
 
-                    if (supervisorName) {
-                        supervisorElement.textContent = supervisorName;
-                        supervisorContainer.classList.remove('hidden');
-                    }
+                    descriptionEl.textContent = staffData.anicureDescription || '';
+                    
+                    // コンテナを表示
+                    supervisorContainer.classList.remove('hidden');
                 }
 
             } catch (error) {
                 console.error('プレビューの読み込みに失敗しました:', error);
                 const articleContainer = document.getElementById('article-container');
-                articleContainer.innerHTML = `
-                    <div class="text-center">
-                        <h1 class="text-2xl font-bold text-red-600">エラーが発生しました</h1>
-                        <p class="mt-4">プレビューの読み込みに失敗しました。</p>
-                        <p class="mt-2 text-sm text-red-500 bg-red-50 p-4 rounded-md">エラー内容: ${error.message}</p>
-                        <p class="mt-6 text-sm text-gray-600">設定項目（サービスドメイン、APIキー、エンドポイント名、各フィールドID）が正しいか確認してください。</p>
-                    </div>`;
+                articleContainer.innerHTML = `<div class="text-center"><h1 class="text-2xl font-bold text-red-600">エラーが発生しました</h1><p class="mt-4">プレビューの読み込みに失敗しました。</p><p class="mt-2 text-sm text-red-500 bg-red-50 p-4 rounded-md">エラー内容: ${error.message}</p></div>`;
             }
         });
     </script>
