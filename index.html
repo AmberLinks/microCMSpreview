@@ -5,16 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>microCMS プレビュー</title>
 
-  <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- Markdown -->
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
-  <!-- microCMS SDK (UMD) -->
   <script src="https://unpkg.com/microcms-js-sdk@latest/dist/umd/microcms-js-sdk.js"></script>
 
-  <!-- Font -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
@@ -25,64 +21,35 @@
       font-family: 'Noto Sans JP', system-ui, -apple-system, Segoe UI, Roboto, 'Helvetica Neue', Arial, 'Noto Sans', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji', sans-serif;
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
-      background-color: #f5f7fb; /* やや明るいグレー */
-      color: #1f2937; /* gray-800 */
+      background-color: #f5f7fb;
+      color: #1f2937;
     }
-
-    /* 本文タイポ */
     .article-prose p { line-height: 2; margin: 1.1rem 0; }
     .article-prose a { color: #2563eb; text-decoration: underline; }
     .article-prose ul { list-style: disc; padding-left: 1.25rem; margin: 1rem 0; }
     .article-prose ol { list-style: decimal; padding-left: 1.25rem; margin: 1rem 0; }
     .article-prose strong { font-weight: 700; }
-    .article-prose img { max-width: 100%; height: auto; }
-
-    /* 大セクション見出し（帯） */
+    .article-prose img { max-width: 100%; height: auto; border-radius: .5rem; }
     .section-h2 {
-      font-size: clamp(1.25rem, 2.2vw, 1.75rem);
-      font-weight: 900;
-      margin-top: 3rem;
-      margin-bottom: 1.25rem;
-      padding: .9rem 1rem;
-      background: #eef2ff;       /* indigo-50 */
-      color: #1e3a8a;            /* indigo-900 */
-      border-left: .5rem solid #4f46e5; /* indigo-600 */
-      border-radius: .5rem;
+      font-size: clamp(1.25rem, 2.2vw, 1.75rem); font-weight: 900; margin-top: 3rem; margin-bottom: 1.25rem;
+      padding: .9rem 1rem; background: #eef2ff; color: #1e3a8a;
+      border-left: .5rem solid #4f46e5; border-radius: .5rem;
     }
-
-    /* 中見出し（下線） */
     .section-h3 {
-      font-size: clamp(1.05rem, 2vw, 1.25rem);
-      font-weight: 800;
-      margin-top: 2.25rem;
-      margin-bottom: .75rem;
-      padding-bottom: .5rem;
-      border-bottom: 2px solid #e5e7eb;
+      font-size: clamp(1.05rem, 2vw, 1.25rem); font-weight: 800; margin-top: 2.25rem; margin-bottom: .75rem;
+      padding-bottom: .5rem; border-bottom: 2px solid #e5e7eb;
     }
-
-    /* まとめ帯（強調） */
     .summary-band {
-      font-size: clamp(1.25rem, 2.2vw, 1.6rem);
-      font-weight: 900;
-      margin-top: 3rem;
-      margin-bottom: 1.25rem;
-      padding: 1rem 1.2rem;
-      background: #f3f4f6; /* gray-100 */
-      color: #111827;      /* gray-900 */
-      border-left: .6rem solid #111827;
-      border-radius: .5rem;
+      font-size: clamp(1.25rem, 2.2vw, 1.6rem); font-weight: 900; margin-top: 3rem; margin-bottom: 1.25rem;
+      padding: 1rem 1.2rem; background: #f3f4f6; color: #111827;
+      border-left: .6rem solid #111827; border-radius: .5rem;
     }
-
-    /* 目次 hover */
     #table-of-contents a:hover { text-decoration: underline; }
-
-    /* 内リンクのスクロール余白（ヘッダーに隠れないよう） */
     h2[id], h3[id] { scroll-margin-top: 96px; }
   </style>
 </head>
 <body class="min-h-screen">
 
-  <!-- 固定ヘッダー -->
   <header class="bg-white/90 backdrop-blur sticky top-0 z-40 border-b border-gray-200">
     <div class="mx-auto max-w-6xl px-4 py-3">
       <div class="flex items-center justify-between">
@@ -92,74 +59,58 @@
     </div>
   </header>
 
-  <!-- Main -->
   <main class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
-
-    <!-- タイトル・日付・概要 -->
     <section class="mb-8 sm:mb-10">
       <div class="bg-white rounded-2xl shadow-sm ring-1 ring-gray-100">
         <div class="px-5 sm:px-8 pt-7 pb-6 sm:pb-7">
           <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
-            <h1 id="article-title" class="text-2xl sm:text-3xl md:text-4xl font-extrabold leading-snug text-gray-900">
-              データを読み込み中...
-            </h1>
+            <h1 id="article-title" class="text-2xl sm:text-3xl md:text-4xl font-extrabold leading-snug text-gray-900">データを読み込み中...</h1>
             <div class="shrink-0 sm:text-right">
               <time id="article-published-at" class="block text-sm text-gray-700"></time>
               <time id="article-updated-at" class="block text-sm text-gray-500"></time>
             </div>
           </div>
-
           <p id="article-description" class="mt-5 text-gray-700 text-base sm:text-lg leading-8"></p>
         </div>
       </div>
     </section>
 
-    <!-- 目次 -->
     <aside id="toc-container" class="hidden mb-10">
       <div class="bg-white rounded-2xl shadow-sm ring-1 ring-gray-100 p-5 sm:p-6">
         <h2 class="text-base font-bold mb-3 flex items-center text-indigo-800">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7" />
-          </svg>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7" /></svg>
           目次
         </h2>
         <ol id="table-of-contents" class="space-y-2 text-[15px]"></ol>
       </div>
     </aside>
 
-    <!-- 本文 -->
     <article id="article-container" class="bg-white rounded-2xl shadow-sm ring-1 ring-gray-100 p-5 sm:p-8 md:p-10">
       <div id="article-body" class="article-prose text-gray-700">
         <p>microCMSからプレビューデータを取得しています。しばらくお待ちください。</p>
       </div>
 
-      <!-- 著者 -->
       <section id="article-author-container" class="hidden mt-14 pt-8 border-t border-gray-200">
         <div class="flex items-start gap-5">
-          <img id="author-avatar" src="" alt="著者アイコン"
-               class="h-16 w-16 rounded-full object-cover border-4 border-white shadow-md"/>
+          <img id="author-avatar" src="" alt="著者アイコン" class="h-16 w-16 rounded-full object-cover border-4 border-white shadow-md"/>
           <div class="flex-1">
             <p class="text-xs font-semibold text-gray-600 tracking-wide">筆者</p>
             <h3 id="author-name" class="text-lg font-bold text-gray-900 mt-1"></h3>
             <p id="author-bio" class="text-sm text-gray-700 mt-2 leading-7"></p>
-            <a id="author-link" href="#" target="_blank" rel="noopener"
-               class="inline-block mt-3 text-sm font-semibold text-indigo-700 hover:text-indigo-900 transition-colors">プロフィールを見る →</a>
+            <a id="author-link" href="#" target="_blank" rel="noopener" class="inline-block mt-3 text-sm font-semibold text-indigo-700 hover:text-indigo-900 transition-colors">プロフィールを見る →</a>
           </div>
         </div>
       </section>
 
-      <!-- 監修（任意） -->
       <section id="article-supervisor-container" class="hidden mt-10">
         <div class="mt-8 p-6 rounded-xl bg-gray-50">
           <div class="flex items-start gap-5">
-            <img id="supervisor-icon" src="" alt="監修者アイコン"
-                 class="h-16 w-16 rounded-full object-cover border-4 border-white shadow-md"/>
+            <img id="supervisor-icon" src="" alt="監修者アイコン" class="h-16 w-16 rounded-full object-cover border-4 border-white shadow-md"/>
             <div class="flex-1">
               <p id="supervisor-label" class="text-xs font-semibold text-gray-600 tracking-wide">監修</p>
               <h3 id="supervisor-name" class="text-lg font-bold text-gray-900 mt-1"></h3>
               <p id="supervisor-description" class="text-sm text-gray-700 mt-2 leading-7"></p>
-              <a id="supervisor-link" href="#" target="_blank" rel="noopener"
-                 class="inline-block mt-3 text-sm font-semibold text-indigo-700 hover:text-indigo-900 transition-colors">詳しくはこちら →</a>
+              <a id="supervisor-link" href="#" target="_blank" rel="noopener" class="inline-block mt-3 text-sm font-semibold text-indigo-700 hover:text-indigo-900 transition-colors">詳しくはこちら →</a>
             </div>
           </div>
         </div>
@@ -180,215 +131,133 @@
     const SERVICE_DOMAIN = 'anicure-dev';
     const API_KEY        = '89b2759d3aa84128a5726ccf46c4fa605b07';
 
-    const ARTICLE_ENDPOINT = 'articles';
+    // --- APIエンドポイント設定 ---
+    const ARTICLE_ENDPOINT    = 'articles';
+    const AUTHOR_ENDPOINT     = 'staff'; // ★★★ 著者が所属するAPIエンドポイント名
+    const SUPERVISOR_ENDPOINT = 'staff'; // ★★★ 監修者が所属するAPIエンドポイント名
 
-    // --- フィールドID設定（あなたのスキーマに合わせて必要なら変更） ---
-    const FIELD = {
-      title:        'title',
-      description:  'description',
-      body:         'body',
-      publishedAt:  'publishedAt',
-      updatedAt:    'updatedAt',   // microCMSの更新日時
-      author:       ['author', 'writer'], // どちらか存在する方を使う
-      supervisor:   'supervisor'
+    // --- 記事APIのフィールドID設定 ---
+    const ARTICLE_FIELD = {
+      title:       'title',
+      description: 'description',
+      body:        'body',
+      publishedAt: 'publishedAt',
+      updatedAt:   'revisedAt',
+      author:      'author',
+      supervisor:  'supervisor'
+    };
+    
+    // ===== ユーティリティ関数 =====
+    const getImageUrl = (imageObj) => {
+      if (!imageObj) return '';
+      if (typeof imageObj === 'string') return imageObj;
+      return imageObj.url || '';
     };
 
-    // 著者エンティティで探す可能性のあるフィールド名
-    const AUTHOR_FIELD = {
-      name:        ['name', 'authorName'],
-      bio:         ['bio', 'profile', 'description'],
-      avatarUrl:   ['avatar', 'icon', 'thumbnail'],
-      profileUrl:  ['profileUrl', 'url', 'link']
-    };
-
-    // 監修エンティティで探す可能性のあるフィールド名（任意）
-    const SUPERVISOR_FIELD = {
-      name:        ['name'],
-      roleArray:   ['role', 'roles', 'anicureRole'],
-      desc:        ['description', 'bio', 'anicureDescription'],
-      avatarUrl:   ['avatar', 'icon', 'thumbnail', 'anicureThumbnail'],
-      profileUrl:  ['profileUrl', 'url', 'anicureProfileUrl']
-    };
-
-    // ===== microCMS Client =====
-    const client = microcms.createClient({
-      serviceDomain: SERVICE_DOMAIN,
-      apiKey: API_KEY,
-    });
-
-    // ===== ユーティリティ =====
-    const getFirst = (obj, keys) => {
-      for (const k of keys) {
-        const v = obj?.[k];
-        if (v !== undefined && v !== null) return v;
-      }
-      return undefined;
-    };
-
-    const getImageUrl = (maybe) => {
-      if (!maybe) return '';
-      if (typeof maybe === 'string') return maybe;
-      if (maybe.url) return maybe.url;
-      return '';
-    };
-
-    const formatYMD = (dStr) => {
+    const formatYMD = (dateString) => {
+      if (!dateString) return '';
       try {
-        const d = new Date(dStr);
-        const y = d.getFullYear();
-        const m = String(d.getMonth() + 1).padStart(2, '0');
-        const day = String(d.getDate()).padStart(2, '0');
-        return `${y}.${m}.${day}`;
+        const date = new Date(dateString);
+        const y = date.getFullYear();
+        const m = String(date.getMonth() + 1).padStart(2, '0');
+        const d = String(date.getDate()).padStart(2, '0');
+        return `${y}.${m}.${d}`;
       } catch { return ''; }
     };
-
-    // 見出し装飾（まとめだけ太帯）
+    
+    // ===== DOM操作 =====
     const decorateHeadings = (rootEl) => {
       rootEl.querySelectorAll('h2').forEach(h => {
         const text = (h.textContent || '').trim();
-        if (text.startsWith('まとめ') || text.startsWith('まとめ：') || text.startsWith('まとめ:')) {
-          h.classList.add('summary-band');
-        } else {
-          h.classList.add('section-h2');
-        }
+        h.classList.add(text.startsWith('まとめ') ? 'summary-band' : 'section-h2');
       });
       rootEl.querySelectorAll('h3').forEach(h => h.classList.add('section-h3'));
     };
 
-    // 目次生成
     const createToc = (bodyElement) => {
       const tocContainer = document.getElementById('toc-container');
       const tocList = document.getElementById('table-of-contents');
       tocList.innerHTML = '';
-
       const headings = bodyElement.querySelectorAll('h2, h3');
       if (!headings.length) {
         tocContainer.classList.add('hidden');
         return;
       }
       headings.forEach((heading, index) => {
-        const id = `toc-${index}`;
-        heading.id = id;
-
+        heading.id = `toc-${index}`;
         const li = document.createElement('li');
         const a = document.createElement('a');
-        a.href = `#${id}`;
+        a.href = `#${heading.id}`;
         a.textContent = heading.textContent;
         a.className = 'hover:underline';
-
-        if (heading.tagName === 'H2') {
-          li.className = 'font-semibold text-indigo-800';
-        } else {
-          li.className = 'ml-4 text-indigo-700';
-        }
+        li.className = heading.tagName === 'H2' ? 'font-semibold text-indigo-800' : 'ml-4 text-indigo-700';
         li.appendChild(a);
         tocList.appendChild(li);
       });
-
       tocContainer.classList.remove('hidden');
     };
 
+    // ===== メイン処理 =====
     document.addEventListener('DOMContentLoaded', async () => {
-      const titleEl = document.getElementById('article-title');
-      const pubEl   = document.getElementById('article-published-at');
-      const updEl   = document.getElementById('article-updated-at');
-      const descEl  = document.getElementById('article-description');
-      const bodyEl  = document.getElementById('article-body');
+      const client = microcms.createClient({ serviceDomain: SERVICE_DOMAIN, apiKey: API_KEY });
 
       try {
-        const params    = new URLSearchParams(window.location.search);
+        const params = new URLSearchParams(window.location.search);
         const contentId = params.get('contentId');
-        const draftKey  = params.get('draftKey');
-        if (!contentId || !draftKey) throw new Error('プレビュー用のパラメータ（contentId / draftKey）が見つかりません。');
+        const draftKey = params.get('draftKey');
+        if (!contentId || !draftKey) throw new Error('プレビュー用のパラメータが見つかりません。');
 
-        // 記事データ
-        const article = await client.get({
-          endpoint: ARTICLE_ENDPOINT,
-          contentId,
-          queries: { draftKey },
-        });
+        // 1. 記事データを取得
+        const article = await client.get({ endpoint: ARTICLE_ENDPOINT, contentId, queries: { draftKey } });
 
-        // 基本情報
-        titleEl.textContent = article[FIELD.title] || 'タイトル未設定';
-        if (article[FIELD.publishedAt]) pubEl.textContent = `公開日: ${formatYMD(article[FIELD.publishedAt])}`;
-        if (article[FIELD.updatedAt])   updEl.textContent = `更新日: ${formatYMD(article[FIELD.updatedAt])}`;
-        descEl.textContent = article[FIELD.description] || '';
+        // 2. 記事の基本情報を表示
+        document.getElementById('article-title').textContent = article[ARTICLE_FIELD.title] || 'タイトル未設定';
+        document.getElementById('article-published-at').textContent = `公開：${formatYMD(article[ARTICLE_FIELD.publishedAt])}`;
+        document.getElementById('article-updated-at').textContent = `更新：${formatYMD(article[ARTICLE_FIELD.updatedAt])}`;
+        document.getElementById('article-description').textContent = article[ARTICLE_FIELD.description] || '';
 
-        // 本文
-        if (article[FIELD.body]) {
-          bodyEl.innerHTML = marked.parse(article[FIELD.body]);
+        // 3. 本文をレンダリング
+        const bodyEl = document.getElementById('article-body');
+        if (article[ARTICLE_FIELD.body]) {
+          bodyEl.innerHTML = marked.parse(article[ARTICLE_FIELD.body]);
           decorateHeadings(bodyEl);
           createToc(bodyEl);
         } else {
           bodyEl.innerHTML = '<p>本文が設定されていません。</p>';
         }
-
-        // 著者（author / writer いずれか）
-        const authorKey = Array.isArray(FIELD.author)
-          ? FIELD.author.find(k => !!article[k])
-          : FIELD.author;
-
-        if (authorKey && article[authorKey]?.id) {
-          const author = await client.get({ endpoint: authorKey, contentId: article[authorKey].id });
-
-          const authorContainer = document.getElementById('article-author-container');
-          const avatarEl  = document.getElementById('author-avatar');
-          const nameEl    = document.getElementById('author-name');
-          const bioEl     = document.getElementById('author-bio');
-          const linkEl    = document.getElementById('author-link');
-
-          const name  = getFirst(author, AUTHOR_FIELD.name) || '';
-          const bio   = getFirst(author, AUTHOR_FIELD.bio) || '';
-          const avRaw = getFirst(author, AUTHOR_FIELD.avatarUrl);
-          const url   = getFirst(author, AUTHOR_FIELD.profileUrl);
-
-          const avatarUrl = getImageUrl(avRaw);
-          if (avatarUrl) avatarEl.src = avatarUrl; else avatarEl.classList.add('hidden');
-          nameEl.textContent = name;
-          bioEl.textContent  = bio;
-          if (url) linkEl.href = url; else linkEl.classList.add('pointer-events-none', 'opacity-40');
-
-          authorContainer.classList.remove('hidden');
+        
+        // 4. 著者情報を取得・表示
+        const authorRef = article[ARTICLE_FIELD.author];
+        if (authorRef && authorRef.id) {
+            const author = await client.get({ endpoint: AUTHOR_ENDPOINT, contentId: authorRef.id });
+            
+            document.getElementById('author-avatar').src = getImageUrl(author.anicureThumbnail);
+            document.getElementById('author-name').textContent = author.name || '';
+            document.getElementById('author-bio').textContent = author.anicureDescription || '';
+            // 必要に応じてプロフィールへのリンクを設定
+            // document.getElementById('author-link').href = ...; 
+            document.getElementById('article-author-container').classList.remove('hidden');
         }
 
-        // 監修（存在する場合のみ）
-        if (article[FIELD.supervisor]?.id) {
-          const sup = await client.get({ endpoint: FIELD.supervisor, contentId: article[FIELD.supervisor].id });
+        // 5. 監修者情報を取得・表示
+        const supervisorRef = article[ARTICLE_FIELD.supervisor];
+        if (supervisorRef && supervisorRef.id) {
+            const supervisor = await client.get({ endpoint: SUPERVISOR_ENDPOINT, contentId: supervisorRef.id });
 
-          const containerEl   = document.getElementById('article-supervisor-container');
-          const iconEl        = document.getElementById('supervisor-icon');
-          const labelEl       = document.getElementById('supervisor-label');
-          const nameEl        = document.getElementById('supervisor-name');
-          const descTextEl    = document.getElementById('supervisor-description');
-          const linkEl        = document.getElementById('supervisor-link');
-
-          const roleArr = getFirst(sup, SUPERVISOR_FIELD.roleArray);
-          labelEl.textContent = Array.isArray(roleArr) && roleArr.length ? roleArr.join(' / ') : '監修';
-
-          nameEl.textContent = getFirst(sup, SUPERVISOR_FIELD.name) || '';
-          descTextEl.textContent = getFirst(sup, SUPERVISOR_FIELD.desc) || '';
-
-          const avRaw = getFirst(sup, SUPERVISOR_FIELD.avatarUrl);
-          const avatarUrl = getImageUrl(avRaw);
-          if (avatarUrl) iconEl.src = avatarUrl; else iconEl.classList.add('hidden');
-
-          const url = getFirst(sup, SUPERVISOR_FIELD.profileUrl);
-          if (url) linkEl.href = url; else linkEl.classList.add('pointer-events-none', 'opacity-40');
-
-          containerEl.classList.remove('hidden');
+            const role = (supervisor.anicureRole || []).join(' / ');
+            document.getElementById('supervisor-label').textContent = role || '監修';
+            document.getElementById('supervisor-icon').src = getImageUrl(supervisor.anicureThumbnail);
+            document.getElementById('supervisor-name').textContent = `${supervisor.name || ''} ${role ? `(${role})` : ''}`;
+            document.getElementById('supervisor-description').textContent = supervisor.anicureDescription || '';
+            // 必要に応じてプロフィールへのリンクを設定
+            // document.getElementById('supervisor-link').href = ...;
+            document.getElementById('article-supervisor-container').classList.remove('hidden');
         }
 
       } catch (error) {
-        console.error('読み込み失敗:', error);
+        console.error('プレビューの読み込みに失敗:', error);
         const container = document.getElementById('article-container');
-        container.innerHTML =
-          `<div class="text-center py-12">
-             <h1 class="text-2xl font-bold text-red-600">エラーが発生しました</h1>
-             <p class="mt-4">プレビューの読み込みに失敗しました。</p>
-             <p class="mt-3 text-sm text-red-700 bg-red-50 inline-block px-4 py-2 rounded-md">
-               ${error.message}
-             </p>
-           </div>`;
+        container.innerHTML = `<div class="text-center py-12"><h1 class="text-2xl font-bold text-red-600">エラーが発生しました</h1><p class="mt-4">プレビューの読み込みに失敗しました。</p><p class="mt-3 text-sm text-red-700 bg-red-50 inline-block px-4 py-2 rounded-md">${error.message}</p></div>`;
       }
     });
   </script>
