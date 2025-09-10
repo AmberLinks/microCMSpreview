@@ -5,17 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>microCMS プレビュー</title>
     
-    <!-- Tailwind CSS: スタイリング用 -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- marked.js: MarkdownをHTMLに変換するライブラリ -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
-    <!-- microCMS JavaScript SDK: microCMSからデータを取得するためのライブラリ -->
     <script src="https://unpkg.com/microcms-js-sdk@latest/dist/umd/microcms-js-sdk.js"></script>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic" crossorigin>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
     
     <style>
@@ -67,6 +64,15 @@
             padding-bottom: 0.25rem;
             border-bottom: 1px solid #e5e7eb; /* border-gray-200 */
         }
+        
+        /* 記事本文のh4タグのスタイルを追加 */
+        .prose h4 {
+            font-size: 1.125rem; /* text-lg */
+            font-weight: 700;
+            color: #1f2937; /* text-gray-800 */
+            margin-top: 2rem;
+            margin-bottom: 0.75rem;
+        }
 
         .prose p {
             font-size: 1rem;
@@ -115,7 +121,6 @@
 
     <main class="container mx-auto max-w-4xl px-4 py-8 sm:py-12">
         <article id="article-container" class="prose max-w-none bg-white p-6 sm:p-8 md:p-12 rounded-lg shadow-md">
-            <!-- タイトル、公開日、概要 -->
             <div class="not-prose mb-10 pb-8 border-b border-gray-200">
                 <div id="article-meta">
                     <h1 id="article-title" class="text-gray-400">データを読み込み中...</h1>
@@ -124,7 +129,6 @@
                 </div>
             </div>
 
-            <!-- 目次 (ここに追加) -->
             <div id="toc-container" class="not-prose hidden mb-12 p-6 bg-gray-50 rounded-lg border">
                 <h2 class="text-lg font-bold mb-4 flex items-center">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7" /></svg>
@@ -133,12 +137,10 @@
                 <ol id="table-of-contents" class="space-y-2"></ol>
             </div>
             
-            <!-- 本文 -->
             <div id="article-body" class="text-gray-400">
                 <p>microCMSからプレビューデータを取得しています。しばらくお待ちください。</p>
             </div>
 
-            <!-- 監修者 -->
             <div id="article-supervisor-container" class="hidden mt-12 pt-6 border-t border-gray-200">
                 <p class="text-sm text-gray-600">監修</p>
                 <p id="article-supervisor" class="text-base font-bold text-gray-800 mt-1"></p>
@@ -148,8 +150,13 @@
 
     <script>
         // --- 設定項目 ---
+        // ★★★ ご自身のmicroCMSのサービスドメインに書き換えてください ★★★
         const SERVICE_DOMAIN = 'anicure-dev'; 
+        
+        // ★★★ ご自身のmicroCMSのAPIキー（下書き取得権限のあるもの）に書き換えてください ★★★
         const API_KEY = '89b2759d3aa84128a5726ccf46c4fa605b07';
+        
+        // APIのエンドポイント名
         const API_ENDPOINT = 'articles';
         
         // --- フィールドIDの設定 ---
@@ -157,7 +164,7 @@
         const DESCRIPTION_FIELD_ID = 'description';
         const BODY_FIELD_ID = 'body';
         const SUPERVISOR_FIELD_ID = 'supervisor';
-        const PUBLISHED_AT_FIELD_ID = 'publishedAt';
+        const PUBLISHED_AT_FIELD_ID = 'publishedAt'; // createdAt ではなく publishedAt を使用
 
         const client = microcms.createClient({
             serviceDomain: SERVICE_DOMAIN,
@@ -170,6 +177,7 @@
             const tocList = document.getElementById('table-of-contents');
             tocList.innerHTML = ''; // 既存の目次をクリア
 
+            // bodyElement 内の h2 と h3 タグを取得
             const headings = bodyElement.querySelectorAll('h2, h3');
 
             if (headings.length === 0) {
@@ -178,7 +186,8 @@
             }
 
             headings.forEach((heading, index) => {
-                const id = `toc-${index}`;
+                // 各見出しにユニークなIDを付与
+                const id = heading.id || `toc-${index}`;
                 heading.id = id;
 
                 const li = document.createElement('li');
@@ -209,14 +218,16 @@
             const supervisorElement = document.getElementById('article-supervisor');
 
             try {
+                // URLから contentId と draftKey を取得
                 const params = new URLSearchParams(window.location.search);
                 const contentId = params.get('contentId');
                 const draftKey = params.get('draftKey');
 
                 if (!contentId || !draftKey) {
-                    throw new Error('プレビュー用のパラメータが見つかりません。');
+                    throw new Error('プレビュー用のパラメータ（contentId, draftKey）がURLに見つかりません。');
                 }
 
+                // microCMSから下書きデータを取得
                 const data = await client.get({
                     endpoint: API_ENDPOINT,
                     contentId: contentId,
@@ -232,11 +243,13 @@
                 }
 
                 // 2. 公開日を設定
-                if (data[PUBLISHED_AT_FIELD_ID]) {
-                    const date = new Date(data[PUBLISHED_AT_FIELD_ID]);
+                // "publishedAt" を使用。なければ "createdAt" をフォールバックとして使用。
+                const dateString = data[PUBLISHED_AT_FIELD_ID] || data.createdAt;
+                if (dateString) {
+                    const date = new Date(dateString);
                     const formattedDate = `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, '0')}.${String(date.getDate()).padStart(2, '0')}`;
                     publishedAtElement.textContent = `公開日: ${formattedDate}`;
-                    publishedAtElement.setAttribute('datetime', data[PUBLISHED_AT_FIELD_ID]);
+                    publishedAtElement.setAttribute('datetime', dateString);
                 }
 
                 // 3. 概要を設定
@@ -244,12 +257,12 @@
                     descriptionElement.textContent = data[DESCRIPTION_FIELD_ID];
                 }
 
-                // 4. 本文（Markdown）をHTMLに変換して設定
+                // 4. 本文を設定 (APIレスポンスがHTMLなのでmarked.jsは不要)
                 if (data[BODY_FIELD_ID]) {
-                    bodyElement.innerHTML = marked.parse(data[BODY_FIELD_ID]);
+                    bodyElement.innerHTML = data[BODY_FIELD_ID];
                     bodyElement.classList.remove('text-gray-400');
                     
-                    // ★本文がレンダリングされた後に目次を生成
+                    // 本文がレンダリングされた後に目次を生成
                     createTableOfContents(bodyElement);
 
                 } else {
@@ -257,34 +270,15 @@
                 }
 
                 // 5. 監修者を設定
-                if (data[SUPERVISOR_FIELD_ID]) {
-                    const supervisorData = data[SUPERVISOR_FIELD_ID];
-                    let supervisorName = '';
-
-                    if (typeof supervisorData === 'object' && supervisorData !== null) {
-                        if (supervisorData.name) {
-                            supervisorName = supervisorData.name;
-                        } else if (supervisorData.title) {
-                            supervisorName = supervisorData.title;
-                        } else {
-                            console.log('監修者オブジェクトの内容:', supervisorData);
-                            supervisorName = '監修者名の取得に失敗 (詳細はコンソールを確認)';
-                        }
-                    } 
-                    else if (typeof supervisorData === 'string') {
-                        supervisorName = supervisorData;
-                    }
-
-                    if (supervisorName) {
-                        supervisorElement.textContent = supervisorName;
-                        supervisorContainer.classList.remove('hidden');
-                    }
+                if (data[SUPERVISOR_FIELD_ID] && data[SUPERVISOR_FIELD_ID].name) {
+                    supervisorElement.textContent = data[SUPERVISOR_FIELD_ID].name;
+                    supervisorContainer.classList.remove('hidden');
                 }
 
             } catch (error) {
                 console.error('プレビューの読み込みに失敗しました:', error);
                 titleElement.textContent = 'エラーが発生しました';
-                bodyElement.innerHTML = `<p>プレビューの読み込みに失敗しました。</p><p class="text-sm text-red-600">エラー内容: ${error.message}</p><p class="text-sm mt-4">設定項目（サービスドメイン、APIキー、エンドポイント名、各フィールドID）が正しいか確認してください。</p>`;
+                bodyElement.innerHTML = `<p>プレビューの読み込みに失敗しました。</p><p class="text-sm text-red-600">エラー内容: ${error.message}</p><p class="text-sm mt-4">設定項目（サービスドメイン、APIキー、エンドポイント名、各フィールドID）が正しいか、またURLのパラメータが正しいか確認してください。</p>`;
             }
         });
     </script>
